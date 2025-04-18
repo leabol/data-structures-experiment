@@ -234,3 +234,13 @@ void calculate_mul(input *input_a, input *input_b) {
     poly_free(poly_b);
     poly_free(result);
 }
+
+void print_info(input *input_a, input *input_b)
+{
+    printf("多项式 A : ");
+    print_input(input_a);
+    printf("\n");
+    printf("多项式 B : ");
+    print_input(input_b);
+    printf("\n");
+}

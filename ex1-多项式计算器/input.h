@@ -63,4 +63,6 @@ void calculate_neg(input *input_a, input *input_b);
  */
 void calculate_mul(input *input_a, input *input_b);
 
+
+void print_info(input *input_a, input *input_b);
 #endif
