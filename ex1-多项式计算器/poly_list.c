@@ -3,6 +3,7 @@
 #include <string.h>
 #include "array.h"
 #include "poly_list.h"
+#include "input.h"
 
 /**
  * @brief 创建一个新的链表节点
@@ -78,16 +79,6 @@ static int compare(Node *na, Node *nb)
 static void merge(Node *source, Node *direct)
 {
     direct->data->xi += source->data->xi;
-}
-
-static int add(Node *pa,Node *pb)
-{
-    return pa->data->xi += pb->data->xi;
-}
-
-static int neg(Node *pa,Node *pb)
-{
-    return pa->data->xi -= pb->data->xi;
 }
 
 /**
@@ -186,9 +177,9 @@ poly *poly_list_create(input* in)
         array_get(array_zhi, i, &zhi);
         poly_add_term(new_poly, xi, zhi);
     }
-    array_destroy(in->xi);
-    array_destroy(in->zhi);
-    free(in);
+    // array_destroy(in->xi);
+    // array_destroy(in->zhi);
+    // free(in);
 
     return new_poly;
 }
@@ -260,35 +251,46 @@ void Poly_list_print(poly *poly)
 }
 
 /**
- * @brief 对两个多项式执行指定的操作（加法或减法）
+ * @brief 执行两个多项式的减法
  * @param poly1 第一个多项式
  * @param poly2 第二个多项式
- * @param option 操作函数，用于确定如何组合两个项
- * @return 操作结果的新多项式
+ * @return 相减结果的新多项式
  */
-static poly *poly_option(poly *poly1, poly *poly2, int (*option)(Node*, Node*))
+poly *poly_neg(poly *poly1, poly *poly2)
 {
     poly *resault = poly_init();
     Node *pa = poly1->terms;
     Node *pb = poly2->terms;
-
+    Node *temp = NULL;
     while (pa && pb){
-        Node *temp = NULL;
+        temp = NULL;
+        int flag = 1;
         if (pa->data->zhi > pb->data->zhi){
             temp = pa;
             pa = pa->next;
         }else if (pa->data->zhi < pb->data->zhi){
             temp = pb;
             pb = pb->next;
+            flag = -1;
         }else{
-            int add_xi = option(pa,pb); 
+            int add_xi = pa->data->xi - pb->data->xi; 
             int add_zhi = pa->data->zhi; 
             poly_add_term(resault, add_xi,add_zhi);
             pa = pa->next;
             pb = pb->next;
             continue;
         }
+        poly_add_term(resault, flag * temp->data->xi,temp->data->zhi);
+    }
+    while (pa){
+        temp = pa;
+        pa = pa->next;
         poly_add_term(resault, temp->data->xi,temp->data->zhi);
+    }
+    while (pb){
+        temp = pb;
+        pb = pb->next;
+        poly_add_term(resault, -temp->data->xi,temp->data->zhi);
     }
     return resault;
 }
@@ -301,18 +303,39 @@ static poly *poly_option(poly *poly1, poly *poly2, int (*option)(Node*, Node*))
  */
 poly *poly_add(poly *poly1, poly *poly2)
 {
-    return poly_option(poly1,poly2,add);
-}
-
-/**
- * @brief 执行两个多项式的减法
- * @param poly1 第一个多项式
- * @param poly2 第二个多项式
- * @return 相减结果的新多项式
- */
-poly *poly_neg(poly *poly1, poly *poly2)
-{
-    return poly_option(poly1,poly2,neg);
+    poly *resault = poly_init();
+    Node *pa = poly1->terms;
+    Node *pb = poly2->terms;
+    Node *temp = NULL;
+    while (pa && pb){
+        temp = NULL;
+        if (pa->data->zhi > pb->data->zhi){
+            temp = pa;
+            pa = pa->next;
+        }else if (pa->data->zhi < pb->data->zhi){
+            temp = pb;
+            pb = pb->next;
+        }else{
+            int add_xi = pa->data->xi + pb->data->xi; 
+            int add_zhi = pa->data->zhi; 
+            poly_add_term(resault, add_xi,add_zhi);
+            pa = pa->next;
+            pb = pb->next;
+            continue;
+        }
+        poly_add_term(resault, temp->data->xi,temp->data->zhi);
+    }
+    while (pa){
+        temp = pa;
+        pa = pa->next;
+        poly_add_term(resault, temp->data->xi,temp->data->zhi);
+    }
+    while (pb){
+        temp = pb;
+        pb = pb->next;
+        poly_add_term(resault, temp->data->xi,temp->data->zhi);
+    }
+    return resault;
 }
 
 /**

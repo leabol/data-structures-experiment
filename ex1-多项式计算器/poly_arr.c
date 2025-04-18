@@ -1,4 +1,5 @@
 #include "poly_arr.h"
+#include "input.h"
 
 int *poly_arr_create(input *in)
 {
@@ -9,16 +10,16 @@ int *poly_arr_create(input *in)
 
     memset(poly_arr,0,sizeof(int) * (size + 2));
     int xi,zhi;
-    for (int i = 0; i < size; i++){
+    for (int i = 0; i < in->num; i++){
         array_get(in->xi, i, &xi);
         array_get(in->zhi, i, &zhi);
         poly_arr[zhi + base] = xi;
     }
     poly_arr[0] = size;
     poly_arr[1] = base;
-    array_destroy(in->xi);
-    array_destroy(in->zhi);
-    free(in);
+    // array_destroy(in->xi);
+    // array_destroy(in->zhi);
+    // free(in);
 
     return poly_arr;
 }
@@ -97,7 +98,6 @@ int *poly_arr_neg(int *a, int *b)
     
     return result;
 }
-
 
 int *poly_arr_mul(int *a, int*b)
 {

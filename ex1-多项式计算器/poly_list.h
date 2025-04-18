@@ -1,6 +1,10 @@
 #ifndef POLY_H
 #define POLY_H
 
+// 前向声明输入类型，解决循环依赖
+struct input;
+typedef struct input input;
+
 /**
  * @brief 多项式项结构，表示一个多项式的单个项
  */
@@ -8,13 +12,11 @@ typedef struct term {
     int xi;    /**< 系数 */
     int zhi;   /**< 指数 */
 } term;
+
 typedef struct Node {
     term *data;
     struct Node *next;
 } Node;
-// 包含其他头文件，必须在定义完 term 结构体后
-#include "array.h"
-#include "input.h"
 
 /**
  * @brief 多项式结构，包含项的链表
@@ -22,6 +24,9 @@ typedef struct Node {
 typedef struct poly {
     Node *terms;   /**< 多项式项的链表 */
 } poly;
+
+// 包含其他头文件
+#include "array.h"
 
 /**
  * @brief 创建一个新的多项式
@@ -88,9 +93,11 @@ poly *poly_neg(poly *poly1, poly *poly2);
  */
 poly *poly_mul(poly *poly1, poly *poly2);
 
-
+/**
+ * @brief 从输入结构创建链表多项式
+ * @param in 输入结构指针
+ * @return 创建的多项式指针
+ */
 poly *poly_list_create(input* in);
-
-
 
 #endif /* POLY_H */

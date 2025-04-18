@@ -12,8 +12,6 @@ void print_menu() {
     printf("3. 计算 A + B\n");
     printf("4. 计算 A - B\n");
     printf("5. 计算 A * B\n");
-    printf("6. 显示多项式 A\n");
-    printf("7. 显示多项式 B\n");
     printf("0. 退出\n");
     printf("======================\n");
     printf("请选择操作: ");
@@ -21,170 +19,115 @@ void print_menu() {
 
 int main() {
     int choice;
+    input *input_a = NULL;
+    input *input_b = NULL;
     int *poly_a_arr = NULL;
     int *poly_b_arr = NULL;
-    int *result_arr = NULL;
     poly *poly_a_list = NULL;
     poly *poly_b_list = NULL;
-    poly *result_list = NULL;
-    int storage_type_a = 0; // 0:未定义 1:数组 2:链表
-    int storage_type_b = 0; // 0:未定义 1:数组 2:链表
     
     while (1) {
         print_menu();
         scanf("%d", &choice);
         
         switch (choice) {
-            case 1: {
+            case 1: { // 输入多项式 A
                 // 清理之前的多项式 A
-                if (storage_type_a == 1 && poly_a_arr) {
+                if (poly_a_arr) {
                     poly_arr_free(poly_a_arr);
                     poly_a_arr = NULL;
-                } else if (storage_type_a == 2 && poly_a_list) {
+                }
+                if (poly_a_list) {
                     poly_free(poly_a_list);
                     poly_a_list = NULL;
                 }
+                if (input_a) {
+                    if (input_a->xi) array_destroy(input_a->xi);
+                    if (input_a->zhi) array_destroy(input_a->zhi);
+                    free(input_a);
+                }
                 
-                // 输入新的多项式 A
-                input *in_a = poly_input();
-                if (in_a) {
-                    if (in_a->flag == 2) { // 使用数组存储
-                        poly_a_arr = poly_arr_create(in_a);
-                        storage_type_a = 1;
-                        printf("多项式 A 已采用数组方式存储\n");
-                    } else { // 使用链表存储
-                        poly_a_list = poly_list_create(in_a);
-                        storage_type_a = 2;
-                        printf("多项式 A 已采用链表方式存储\n");
-                    }
+                // 获取新的多项式 A
+                input_a = get_poly_input();
+                if (input_a) {
+                    printf("多项式 A 已输入: ");
+                    print_input(input_a);
+                    printf("\n");
                 }
                 break;
             }
             
-            case 2: {
+            case 2: { // 输入多项式 B
                 // 清理之前的多项式 B
-                if (storage_type_b == 1 && poly_b_arr) {
+                if (poly_b_arr) {
                     poly_arr_free(poly_b_arr);
                     poly_b_arr = NULL;
-                } else if (storage_type_b == 2 && poly_b_list) {
+                }
+                if (poly_b_list) {
                     poly_free(poly_b_list);
                     poly_b_list = NULL;
                 }
+                if (input_b) {
+                    if (input_b->xi) array_destroy(input_b->xi);
+                    if (input_b->zhi) array_destroy(input_b->zhi);
+                    free(input_b);
+                }
                 
-                // 输入新的多项式 B
-                input *in_b = poly_input();
-                if (in_b) {
-                    if (in_b->flag == 2) { // 使用数组存储
-                        poly_b_arr = poly_arr_create(in_b);
-                        storage_type_b = 1;
-                        printf("多项式 B 已采用数组方式存储\n");
-                    } else { // 使用链表存储
-                        poly_b_list = poly_list_create(in_b);
-                        storage_type_b = 2;
-                        printf("多项式 B 已采用链表方式存储\n");
-                    }
+                // 获取新的多项式 B
+                input_b = get_poly_input();
+                if (input_b) {
+                    printf("多项式 B 已输入: ");
+                    print_input(input_b);
+                    printf("\n");
                 }
                 break;
             }
             
             case 3: { // A + B
-                // 清理之前的结果
-                if (result_arr) {
-                    poly_arr_free(result_arr);
-                    result_arr = NULL;
+                if (!input_a || !input_b) {
+                    printf("请先输入多项式 A 和 B\n");
+                    break;
                 }
-                if (result_list) {
-                    poly_free(result_list);
-                    result_list = NULL;
-                }
-                
-                printf("A + B = ");
-                if (storage_type_a == 1 && storage_type_b == 1) {
-                    result_arr = poly_arr_add(poly_a_arr, poly_b_arr);
-                    poly_arr_print(result_arr);
-                } else if (storage_type_a == 2 && storage_type_b == 2) {
-                    result_list = poly_add(poly_a_list, poly_b_list);
-                    Poly_list_print(result_list);
-                    printf("\n");
-                } else {
-                    printf("错误：多项式 A 和 B 的存储方式不兼容\n");
-                }
+                printf("多项式 A : ");
+                print_input(input_a);
+                printf("\n");
+                printf("多项式 B : ");
+                print_input(input_b);
+                printf("\n");
+
+                calculate_add(input_a, input_b);
                 break;
             }
             
             case 4: { // A - B
-                // 清理之前的结果
-                if (result_arr) {
-                    poly_arr_free(result_arr);
-                    result_arr = NULL;
+                if (!input_a || !input_b) {
+                    printf("请先输入多项式 A 和 B\n");
+                    break;
                 }
-                if (result_list) {
-                    poly_free(result_list);
-                    result_list = NULL;
-                }
-                
-                printf("A - B = ");
-                if (storage_type_a == 1 && storage_type_b == 1) {
-                    result_arr = poly_arr_neg(poly_a_arr, poly_b_arr);
-                    poly_arr_print(result_arr);
-                } else if (storage_type_a == 2 && storage_type_b == 2) {
-                    result_list = poly_neg(poly_a_list, poly_b_list);
-                    Poly_list_print(result_list);
-                    printf("\n");
-                } else {
-                    printf("错误：多项式 A 和 B 的存储方式不兼容\n");
-                }
+                printf("多项式 A : ");
+                print_input(input_a);
+                printf("\n");
+                printf("多项式 B : ");
+                print_input(input_b);
+                printf("\n");
+
+                calculate_neg(input_a, input_b);
                 break;
             }
             
             case 5: { // A * B
-                // 清理之前的结果
-                if (result_arr) {
-                    poly_arr_free(result_arr);
-                    result_arr = NULL;
+                if (!input_a || !input_b) {
+                    printf("请先输入多项式 A 和 B\n");
+                    break;
                 }
-                if (result_list) {
-                    poly_free(result_list);
-                    result_list = NULL;
-                }
-                
-                printf("A * B = ");
-                if (storage_type_a == 1 && storage_type_b == 1) {
-                    result_arr = poly_arr_mul(poly_a_arr, poly_b_arr);
-                    poly_arr_print(result_arr);
-                } else if (storage_type_a == 2 && storage_type_b == 2) {
-                    result_list = poly_mul(poly_a_list, poly_b_list);
-                    Poly_list_print(result_list);
-                    printf("\n");
-                } else {
-                    printf("错误：多项式 A 和 B 的存储方式不兼容\n");
-                }
-                break;
-            }
-            
-            case 6: { // 显示多项式 A
-                printf("多项式 A = ");
-                if (storage_type_a == 1) {
-                    poly_arr_print(poly_a_arr);
-                } else if (storage_type_a == 2) {
-                    Poly_list_print(poly_a_list);
-                    printf("\n");
-                } else {
-                    printf("未定义\n");
-                }
-                break;
-            }
-            
-            case 7: { // 显示多项式 B
-                printf("多项式 B = ");
-                if (storage_type_b == 1) {
-                    poly_arr_print(poly_b_arr);
-                } else if (storage_type_b == 2) {
-                    Poly_list_print(poly_b_list);
-                    printf("\n");
-                } else {
-                    printf("未定义\n");
-                }
+                printf("多项式 A : ");
+                print_input(input_a);
+                printf("\n");
+                printf("多项式 B : ");
+                print_input(input_b);
+                printf("\n");
+
+                calculate_mul(input_a, input_b);
                 break;
             }
             
@@ -192,19 +135,28 @@ int main() {
                 // 清理所有资源
                 if (poly_a_arr) poly_arr_free(poly_a_arr);
                 if (poly_b_arr) poly_arr_free(poly_b_arr);
-                if (result_arr) poly_arr_free(result_arr);
                 if (poly_a_list) poly_free(poly_a_list);
                 if (poly_b_list) poly_free(poly_b_list);
-                if (result_list) poly_free(result_list);
                 
-                printf("感谢使用多项式计算器，再见！\n");
+                if (input_a) {
+                    if (input_a->xi) array_destroy(input_a->xi);
+                    if (input_a->zhi) array_destroy(input_a->zhi);
+                    free(input_a);
+                }
+                
+                if (input_b) {
+                    if (input_b->xi) array_destroy(input_b->xi);
+                    if (input_b->zhi) array_destroy(input_b->zhi);
+                    free(input_b);
+                }
+                
                 return 0;
             }
             
             default:
                 printf("无效的选项，请重新选择\n");
         }
-    }
     
-    return 0;
+    }
 }
+

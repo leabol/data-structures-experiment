@@ -1,17 +1,15 @@
 #ifndef POLY_ARR_H
 #define POLY_ARR_H
 
-#include "input.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @file poly_arr.h
- * @brief 使用数组实现多项式操作的库
- * 
- * 本库提供了使用数组表示多项式并进行各种操作的函数。
- * 多项式表示方式：整数数组，其中:
+// 前向声明input结构体
+struct input;
+typedef struct input input;
+
+/*
  * - arr[0]: 保存数组实际大小（有效项数）
  * - arr[1]: 保存基准值（用于映射负指数）
  * - arr[2+i]: 保存对应指数的系数
