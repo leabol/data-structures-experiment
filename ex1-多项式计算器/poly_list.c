@@ -41,13 +41,14 @@ int insert(Node **head, Node *node, int (*compare)(Node *na, Node *nb),void (*me
     }
     if (*cur != NULL && compare(node, *cur) == 0){
         merge(node, *cur);
+        // 释放合并后不再需要的源节点及其数据
+        term_free(node->data);
+        free(node);
         return 1;
     }
     node -> next = *cur;
     *cur = node;
 
-    free(node->data);
-    free(node);
     return 1;
 }
 
@@ -134,6 +135,9 @@ static int insert_sort(Node **head, Node *node)
 
     if (*cur != NULL && compare(node, *cur) == 0){
         merge(node, *cur);
+        // 释放合并后不再需要的源节点及其数据
+        term_free(node->data);
+        free(node);
         return 1;
     }
 
@@ -148,12 +152,25 @@ void poly_add_term(poly* poly, int xi, int zhi)
     if (!poly || xi == 0) return;
 
     term* new_term = term_create(xi, zhi);
+    if (!new_term) {
+        printf("内存分配失败\n");
+        return;
+    }
+    
     Node *new_node = createNode(new_term);
+    if (!new_node) {
+        printf("内存分配失败\n");
+        term_free(new_term);
+        return;
+    }
     
     int erro = insert_sort(&poly->terms, new_node);
     if (erro == -1){
         printf("节点指针无效\n");
-        exit(-1);
+        // 不再使用exit(-1)，而是释放资源后返回
+        term_free(new_term);
+        free(new_node);
+        return;
     }
 }
 
@@ -261,7 +278,7 @@ poly *poly_neg(poly *poly1, poly *poly2)
     poly *resault = poly_init();
     Node *pa = poly1->terms;
     Node *pb = poly2->terms;
-    Node *temp = NULL;
+    const Node *temp = NULL;
     while (pa && pb){
         temp = NULL;
         int flag = 1;
@@ -306,7 +323,7 @@ poly *poly_add(poly *poly1, poly *poly2)
     poly *resault = poly_init();
     Node *pa = poly1->terms;
     Node *pb = poly2->terms;
-    Node *temp = NULL;
+    const Node *temp = NULL;
     while (pa && pb){
         temp = NULL;
         if (pa->data->zhi > pb->data->zhi){

@@ -34,7 +34,7 @@ int *poly_arr_create(input *in);
  * 
  * 将两个多项式相加，返回新的多项式数组。结果多项式的指数范围是输入多项式指数范围的并集。
  */
-int *poly_arr_add(int *a, int *b);
+int *poly_arr_add(const int *a, const int *b);
 
 /**
  * @brief 计算两个多项式的差
@@ -44,7 +44,7 @@ int *poly_arr_add(int *a, int *b);
  * 
  * 从第一个多项式中减去第二个多项式，返回新的多项式数组。
  */
-int *poly_arr_neg(int *a, int *b);
+int *poly_arr_neg(const int *a, const int *b);
 
 /**
  * @brief 计算两个多项式的积
@@ -54,7 +54,7 @@ int *poly_arr_neg(int *a, int *b);
  * 
  * 将两个多项式相乘，返回新的多项式数组。结果多项式的指数范围由输入多项式的指数范围决定。
  */
-int *poly_arr_mul(int *a, int *b);
+int *poly_arr_mul(const int *a, const int *b);
 
 /**
  * @brief 打印多项式
@@ -63,7 +63,7 @@ int *poly_arr_mul(int *a, int *b);
  * 打印多项式的各项，格式为: ax^n+bx^m+...
  * 如果系数为1，则只打印x^n。
  */
-void poly_arr_print(int *poly);
+void poly_arr_print(const int *poly);
 
 /**
  * @brief 释放多项式数组占用的内存

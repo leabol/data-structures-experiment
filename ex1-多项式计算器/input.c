@@ -9,6 +9,13 @@ input *poly_input()
     
     array *array_xi = array_new(10);
     array *array_zhi = array_new(10);
+    // 添加错误检查
+    if (!array_xi || !array_zhi) {
+        if (array_xi) array_destroy(array_xi);
+        if (array_zhi) array_destroy(array_zhi);
+        free(new_input);
+        return NULL;
+    }
 
     printf("输入多项式系数与指数,'0, 0'结束:\n");
     
@@ -143,7 +150,7 @@ input *get_poly_input() {
  * @param list_op 链表操作函数指针
  */
 void perform_operation(input *input_a, input *input_b, const char *operation_name,
-                      int* (*arr_op)(int*, int*),
+                      int* (*arr_op)(const int*, const int*),
                       poly* (*list_op)(poly*, poly*)) {
     // 检查空指针
     if (!input_a || !input_b) {

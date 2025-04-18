@@ -65,7 +65,7 @@ status array_insert(array *arr, size_t index, valueType value);
  * 
  * 若数组为空，则打印提示信息。否则打印数组中所有元素
  */
-void array_print(array *arr);
+void array_print(const array *arr);
 
 /**
  * @brief 移除数组中指定位置的元素

@@ -48,7 +48,7 @@ status array_append(array *arr, valueType value)
     return array_insert(arr, arr -> size, value);
 }
 
-void array_print(array *arr)
+void array_print(const array *arr)
 {
     if (arr == NULL) return;
     if (arr -> size == 0){

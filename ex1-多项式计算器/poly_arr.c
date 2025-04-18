@@ -24,7 +24,7 @@ int *poly_arr_create(input *in)
     return poly_arr;
 }
 
-int *poly_arr_add(int *a, int *b)
+int *poly_arr_add(const int *a, const int *b)
 {
     int a_min = 2 - a[1];
     int a_max = a[0] + a_min - 1;
@@ -61,7 +61,7 @@ int *poly_arr_add(int *a, int *b)
     
     return result;
 }
-int *poly_arr_neg(int *a, int *b)
+int *poly_arr_neg(const int *a, const int *b)
 {
     int a_min = 2 - a[1];
     int a_max = a[0] + a_min - 1;
@@ -99,7 +99,7 @@ int *poly_arr_neg(int *a, int *b)
     return result;
 }
 
-int *poly_arr_mul(int *a, int*b)
+int *poly_arr_mul(const int *a, const int*b)
 {
     int a_min = 2 - a[1];
     int a_max = a[0] + a_min - 1;
@@ -139,7 +139,7 @@ int *poly_arr_mul(int *a, int*b)
     return result;
 }
 
-void poly_arr_print(int *poly)
+void poly_arr_print(const int *poly)
 {
     if (!poly) {
         printf("0\n");
