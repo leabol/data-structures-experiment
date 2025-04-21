@@ -91,9 +91,9 @@ poly *poly_list_neg(poly *poly1, poly *poly2);
 poly *poly_list_mul(poly *poly1, poly *poly2);
 
 /**
- * @brief 从输入结构创建链表多项式
- * @param in 输入结构指针
- * @return 创建的多项式指针
+ * @brief 根据输入数据创建一个多项式链表
+ * @param in 包含系数和指数的输入结构体
+ * @return 新创建的多项式指针
  */
 poly *poly_list_create(input* in);
 

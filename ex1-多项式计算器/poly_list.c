@@ -9,7 +9,7 @@
  * @param data 指向项数据的指针
  * @return 新创建的节点指针，如果内存分配失败则返回NULL
  */
-Node *createNode(term* data)
+static Node *createNode(term* data)
 {
     Node *new_node = (Node*)malloc(sizeof(Node));
     if(new_node == NULL) return NULL;
@@ -28,7 +28,7 @@ Node *createNode(term* data)
  * @param merge 合并函数，当找到相同项时用于合并项
  * @return 成功返回1，失败返回-1
  */
-int insert(Node **head, Node *node, int (*compare)(Node *na, Node *nb),void (*merge)(Node *source, Node *dirct))
+static int insert(Node **head, Node *node, int (*compare)(Node *na, Node *nb),void (*merge)(Node *source, Node *dirct))
 {
     if(head == NULL || node == NULL){
         return -1;
@@ -57,7 +57,7 @@ int insert(Node **head, Node *node, int (*compare)(Node *na, Node *nb),void (*me
  * @param distroy_data 用于释放项数据内存的函数
  * @return 总是返回0
  */
-int destroyList(Node **head, void (*distroy_data)(term* data)){
+static int destroyList(Node **head, void (*distroy_data)(term* data)){
     if (!head || !*head)
         return 0;
     Node *temp = *head;
@@ -82,9 +82,36 @@ static void merge(Node *source, Node *direct)
 }
 
 /**
- * @brief 初始化一个新的多项式
- * @return 指向新创建的多项式的指针，如果内存分配失败则返回NULL
+ * @brief 使用排序插入将节点添加到链表中
+ * @param head 指向链表头指针的指针
+ * @param node 要插入的节点
+ * @return 成功返回1，失败返回-1
  */
+static int insert_sort(Node **head, Node *node)
+{
+    if(head == NULL || node == NULL) return -1;
+
+    Node **cur = head;
+    while (*cur != NULL && compare(node, *cur) < 0){//node < cur
+        cur = &((*cur) ->next);
+    }
+
+    if (*cur != NULL && compare(node, *cur) == 0){
+        merge(node, *cur);
+        // 释放合并后不再需要的源节点及其数据
+        term_free(node->data);
+        free(node);
+        return 1;
+    }
+
+    node -> next = *cur;
+    *cur = node;
+
+    return 1;
+}
+
+/*------------------------------ 以下为接口函数---------------------------------------*/
+
 poly *poly_init()
 {
     poly *new_poly = (poly*)malloc(sizeof(poly));
@@ -117,35 +144,6 @@ void poly_list_free(poly* mypoly)
     free(mypoly);
 }
 
-/**
- * @brief 使用排序插入将节点添加到链表中
- * @param head 指向链表头指针的指针
- * @param node 要插入的节点
- * @return 成功返回1，失败返回-1
- */
-static int insert_sort(Node **head, Node *node)
-{
-    if(head == NULL || node == NULL) return -1;
-
-    Node **cur = head;
-    while (*cur != NULL && compare(node, *cur) < 0){//node < cur
-        cur = &((*cur) ->next);
-    }
-
-    if (*cur != NULL && compare(node, *cur) == 0){
-        merge(node, *cur);
-        // 释放合并后不再需要的源节点及其数据
-        term_free(node->data);
-        free(node);
-        return 1;
-    }
-
-    node -> next = *cur;
-    *cur = node;
-
-    return 1;
-}
-
 void poly_add_term(poly* poly, int xi, int zhi)
 {
     if (!poly || xi == 0) return;
@@ -173,13 +171,6 @@ void poly_add_term(poly* poly, int xi, int zhi)
     }
 }
 
-/**
- * @brief 根据输入数据创建一个多项式链表
- * @param in 包含系数和指数的输入结构体
- * @return 新创建的多项式指针
- * 
- * 该函数会释放输入结构体的内存
- */
 poly *poly_list_create(input* in)
 {
     array *array_xi = in->xi;
@@ -193,23 +184,9 @@ poly *poly_list_create(input* in)
         array_get(array_zhi, i, &zhi);
         poly_add_term(new_poly, xi, zhi);
     }
-    // array_destroy(in->xi);
-    // array_destroy(in->zhi);
-    // free(in);
-
     return new_poly;
 }
 
-/**
- * @brief 打印多项式
- * @param poly 要打印的多项式指针
- * 
- * 按照标准数学表示法打印多项式。处理特殊情况如：
- * - 空多项式或所有系数为0时打印"0"
- * - 系数为1的非常数项不显示系数
- * - 一次项显示为"x"而不是"x^1"
- * - 正确处理正负号和加减符号
- */
 void Poly_list_print(poly *poly)
 {
     if (!poly || !poly->terms) {
@@ -229,7 +206,6 @@ void Poly_list_print(poly *poly)
             cur = cur->next;
             continue;
         }
-        
         // 处理符号
         if (first_term) {
             if (xi < 0) printf("-");
@@ -237,7 +213,6 @@ void Poly_list_print(poly *poly)
         } else {
             printf(xi > 0 ? " + " : " - ");
         }
-        
         // 打印系数（取绝对值）
         int abs_xi = xi > 0 ? xi : -xi;
         
@@ -259,19 +234,12 @@ void Poly_list_print(poly *poly)
         
         cur = cur->next;
     }
-    
     // 如果多项式为空（所有系数为0）
     if (first_term) {
         printf("0");
     }
 }
 
-/**
- * @brief 执行两个多项式的减法
- * @param poly1 第一个多项式
- * @param poly2 第二个多项式
- * @return 相减结果的新多项式
- */
 poly *poly_list_neg(poly *poly1, poly *poly2)
 {
     poly *resault = poly_init();
@@ -311,12 +279,6 @@ poly *poly_list_neg(poly *poly1, poly *poly2)
     return resault;
 }
 
-/**
- * @brief 执行两个多项式的加法
- * @param poly1 第一个多项式
- * @param poly2 第二个多项式
- * @return 相加结果的新多项式
- */
 poly *poly_list_add(poly *poly1, poly *poly2)
 {
     poly *resault = poly_init();
@@ -354,12 +316,6 @@ poly *poly_list_add(poly *poly1, poly *poly2)
     return resault;
 }
 
-/**
- * @brief 执行两个多项式的乘法
- * @param poly1 第一个多项式
- * @param poly2 第二个多项式
- * @return 相乘结果的新多项式
- */
 poly *poly_list_mul(poly *poly1, poly *poly2)
 {
     poly *result = poly_init();

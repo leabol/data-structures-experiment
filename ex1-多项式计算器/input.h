@@ -11,12 +11,18 @@ typedef struct input{
     int num;
 } input;
 
+/**
+ * @brief 打印输入的一个多项式, 以输入的顺序
+ */
 void print_input(input* in);
 
+/**
+ * @brief 打印输入的两个多项式, 以输入的顺序
+ */
 void print_info(input *input_a, input *input_b);
 
 /**
- * @brief 处理输入并获取多项式结构
+ * @brief 从键盘中读取多项式的系数和指数, 系数为零的会被忽略,输入"0 0"接触`结束输入 
  * @return 返回输入的多项式结构
  */
 input *get_poly_input();
