@@ -40,7 +40,7 @@ int main()
                     poly_a_arr = NULL;
                 }
                 if (poly_a_list){
-                    poly_free(poly_a_list);
+                    poly_list_free(poly_a_list);
                     poly_a_list = NULL;
                 }
                 // 释放先前的input_a
@@ -65,29 +65,24 @@ int main()
             }
 
             case 2:
-            { // 输入多项式 B
-                // 清理之前的多项式 B
+            { 
                 if (poly_b_arr){
                     poly_arr_free(poly_b_arr);
                     poly_b_arr = NULL;
                 }
                 if (poly_b_list){
-                    poly_free(poly_b_list);
+                    poly_list_free(poly_b_list);
                     poly_b_list = NULL;
                 }
-                // 释放先前的input_b
                 if (input_b){
-                    // 先检查并释放数组
                     if (input_b->xi)
                         array_destroy(input_b->xi);
                     if (input_b->zhi)
                         array_destroy(input_b->zhi);
-                    // 然后释放结构体本身
                     free(input_b);
                     input_b = NULL;
                 }
 
-                // 获取新的多项式 B
                 input_b = get_poly_input();
                 if (input_b){
                     printf("多项式 B 已输入: ");
@@ -138,9 +133,9 @@ int main()
                 if (poly_b_arr)
                     poly_arr_free(poly_b_arr);
                 if (poly_a_list)
-                    poly_free(poly_a_list);
+                    poly_list_free(poly_a_list);
                 if (poly_b_list)
-                    poly_free(poly_b_list);
+                    poly_list_free(poly_b_list);
 
                 // 释放input_a
                 if (input_a){

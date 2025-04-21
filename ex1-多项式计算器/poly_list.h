@@ -52,7 +52,7 @@ void term_free(term* term);
  * @brief 释放一个多项式的内存，包括其所有项
  * @param mypoly 要释放的多项式指针
  */
-void poly_free(poly* mypoly);
+void poly_list_free(poly* mypoly);
 
 
 /**
@@ -75,7 +75,7 @@ void Poly_list_print(poly *poly);
  * @param poly2 第二个多项式
  * @return 相加结果多项式的指针
  */
-poly *poly_add(poly *poly1, poly *poly2);
+poly *poly_list_add(poly *poly1, poly *poly2);
 
 /**
  * @brief 执行两个多项式的减法
@@ -83,7 +83,7 @@ poly *poly_add(poly *poly1, poly *poly2);
  * @param poly2 第二个多项式
  * @return 相减结果多项式的指针
  */
-poly *poly_neg(poly *poly1, poly *poly2);
+poly *poly_list_neg(poly *poly1, poly *poly2);
 
 /**
  * @brief 执行两个多项式的乘法
@@ -91,7 +91,7 @@ poly *poly_neg(poly *poly1, poly *poly2);
  * @param poly2 第二个多项式
  * @return 相乘结果多项式的指针
  */
-poly *poly_mul(poly *poly1, poly *poly2);
+poly *poly_list_mul(poly *poly1, poly *poly2);
 
 /**
  * @brief 从输入结构创建链表多项式

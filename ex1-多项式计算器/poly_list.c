@@ -111,7 +111,7 @@ void term_free(term* term)
     free(term);
 }
 
-void poly_free(poly* mypoly)
+void poly_list_free(poly* mypoly)
 {
     if (!mypoly || !mypoly->terms) return;
     destroyList(&(mypoly->terms),term_free);
@@ -273,7 +273,7 @@ void Poly_list_print(poly *poly)
  * @param poly2 第二个多项式
  * @return 相减结果的新多项式
  */
-poly *poly_neg(poly *poly1, poly *poly2)
+poly *poly_list_neg(poly *poly1, poly *poly2)
 {
     poly *resault = poly_init();
     Node *pa = poly1->terms;
@@ -318,7 +318,7 @@ poly *poly_neg(poly *poly1, poly *poly2)
  * @param poly2 第二个多项式
  * @return 相加结果的新多项式
  */
-poly *poly_add(poly *poly1, poly *poly2)
+poly *poly_list_add(poly *poly1, poly *poly2)
 {
     poly *resault = poly_init();
     Node *pa = poly1->terms;
@@ -361,7 +361,7 @@ poly *poly_add(poly *poly1, poly *poly2)
  * @param poly2 第二个多项式
  * @return 相乘结果的新多项式
  */
-poly *poly_mul(poly *poly1, poly *poly2)
+poly *poly_list_mul(poly *poly1, poly *poly2)
 {
     poly *result = poly_init();
     Node *pa = poly1->terms;

@@ -11,7 +11,6 @@
 typedef struct input{
     array *xi;          /**< 系数数组 */
     array *zhi;         /**< 指数数组 */
-    int flag;
     int base;           // 使用数组存储时的基址,等于最小指数
     int max;
     int num;

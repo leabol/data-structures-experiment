@@ -35,20 +35,10 @@ input *poly_input()
     
     new_input->xi = array_xi;
     new_input->zhi = array_zhi;
-    new_input->flag = 0;
-    // 移除重复赋值
     new_input->base = min;
     new_input->max = max;
     new_input->num = num;
     
-    // 避免除零错误，并改进稀疏度计算
-    if (num == 0 || max < min) {
-        new_input->flag = 2; // 默认使用链表存储
-    } else {
-        double sparsity = (double)num / (max - min + 1);
-        new_input->flag = (sparsity < 0.3) ? 1 : 2; // 1使用链表，2使用数组
-    }
-
     return new_input;
 }
 
@@ -65,9 +55,6 @@ void print_input(input* in)
     for (int i = 0; i < in->num; i++){
         array_get(in->xi, i, &xi);
         array_get(in->zhi, i, &zhi);
-        
-        // 跳过系数为0的项
-        if (xi == 0) continue;
         
         if (printed){
             printf(xi > 0 ? " + " : " - ");
@@ -118,7 +105,7 @@ int determine_storage_type(input *input_a, input *input_b) {
     
     // 避免除零错误
     if (range <= 0) {
-        return 2; // 无效范围情况下默认使用链表
+        return 2; // 输入为空的时候,默认使用链表
     }
     
     int num = input_a->num + input_b->num;
@@ -188,8 +175,8 @@ void perform_operation(input *input_a, input *input_b, const char *operation_nam
         
         if (!poly_a || !poly_b) {
             printf("操作失败：内存分配错误\n");
-            if (poly_a) poly_free(poly_a);
-            if (poly_b) poly_free(poly_b);
+            if (poly_a) poly_list_free(poly_a);
+            if (poly_b) poly_list_free(poly_b);
             return;
         }
         
@@ -199,18 +186,18 @@ void perform_operation(input *input_a, input *input_b, const char *operation_nam
         Poly_list_print(result);
         printf("\n");
         
-        poly_free(poly_a);
-        poly_free(poly_b);
-        poly_free(result);
+        poly_list_free(poly_a);
+        poly_list_free(poly_b);
+        poly_list_free(result);
     }
 }
 
 void calculate_add(input *input_a, input *input_b) {
-    perform_operation(input_a, input_b, "+", poly_arr_add, poly_add);
+    perform_operation(input_a, input_b, "+", poly_arr_add, poly_list_add);
 }
 
 void calculate_neg(input *input_a, input *input_b) {
-    perform_operation(input_a, input_b, "-", poly_arr_neg, poly_neg);
+    perform_operation(input_a, input_b, "-", poly_arr_neg, poly_list_neg);
 }
 
 void calculate_mul(input *input_a, input *input_b) {
@@ -226,20 +213,20 @@ void calculate_mul(input *input_a, input *input_b) {
     
     if (!poly_a || !poly_b) {
         printf("操作失败：内存分配错误\n");
-        if (poly_a) poly_free(poly_a);
-        if (poly_b) poly_free(poly_b);
+        if (poly_a) poly_list_free(poly_a);
+        if (poly_b) poly_list_free(poly_b);
         return;
     }
     
-    poly *result = poly_mul(poly_a, poly_b);
+    poly *result = poly_list_mul(poly_a, poly_b);
     
     printf("A * B = ");
     Poly_list_print(result);
     printf("\n");
     
-    poly_free(poly_a);
-    poly_free(poly_b);
-    poly_free(result);
+    poly_list_free(poly_a);
+    poly_list_free(poly_b);
+    poly_list_free(result);
 }
 
 void print_info(input *input_a, input *input_b)
