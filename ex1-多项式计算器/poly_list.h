@@ -1,7 +1,7 @@
 #ifndef POLY_H
 #define POLY_H
 
-// 前向声明输入类型，解决循环依赖
+// 前向声明输入类型
 struct input;
 typedef struct input input;
 
@@ -24,9 +24,6 @@ typedef struct Node {
 typedef struct poly {
     Node *terms;   /**< 多项式项的链表 */
 } poly;
-
-// 包含其他头文件
-#include "array.h"
 
 /**
  * @brief 创建一个新的多项式

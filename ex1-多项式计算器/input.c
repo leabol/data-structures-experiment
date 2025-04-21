@@ -1,7 +1,9 @@
 #include "input.h"
-#include <limits.h> // 添加 limits.h 头文件用于 INT_MIN 和 INT_MAX
+#include "poly_arr.h"
+#include "poly_list.h"
+#include <limits.h> 
 
-input *poly_input()
+static input *poly_input()
 {
     input *new_input = (input*)malloc(sizeof(input));
     if (!new_input)
@@ -92,7 +94,7 @@ void print_input(input* in)
  * @param input_b 第二个多项式的输入结构
  * @return 1表示使用数组，2表示使用链表
  */
-int determine_storage_type(input *input_a, input *input_b) {
+static int determine_storage_type(input *input_a, input *input_b) {
     // 检查空指针
     if (!input_a || !input_b) {
         return 2; // 空指针情况下默认使用链表
@@ -136,7 +138,7 @@ input *get_poly_input() {
  * @param arr_op 数组操作函数指针
  * @param list_op 链表操作函数指针
  */
-void perform_operation(input *input_a, input *input_b, const char *operation_name,
+static void perform_operation(input *input_a, input *input_b, const char *operation_name,
                       int* (*arr_op)(const int*, const int*),
                       poly* (*list_op)(poly*, poly*)) {
     // 检查空指针
@@ -200,6 +202,7 @@ void calculate_neg(input *input_a, input *input_b) {
     perform_operation(input_a, input_b, "-", poly_arr_neg, poly_list_neg);
 }
 
+//乘法不判断稀疏性,默认使用链表
 void calculate_mul(input *input_a, input *input_b) {
     // 检查空指针
     if (!input_a || !input_b) {

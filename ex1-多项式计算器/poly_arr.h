@@ -1,18 +1,14 @@
 #ifndef POLY_ARR_H
 #define POLY_ARR_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 // 前向声明input结构体
 struct input;
 typedef struct input input;
 
 /*
- * - arr[0]: 保存数组实际大小（有效项数）
- * - arr[1]: 保存基准值（用于映射负指数）
- * - arr[2+i]: 保存对应指数的系数
+ *  arr[0]: 保存数组实际大小（有效项数）
+ *  arr[1]: 保存基准值（用于映射负指数）
+ *  arr[2+i]: 保存对应指数的系数
  */
 
 /**
@@ -20,9 +16,6 @@ typedef struct input input;
  * @param in 包含系数和指数的输入数据结构
  * @return 创建的多项式数组，失败时返回NULL
  * 
- * 根据输入的系数和指数创建多项式的数组表示。返回的数组包含了多项式的所有信息，
- * 其中arr[0]存储数组大小，arr[1]存储基准值，arr[i+2]存储对应指数的系数。
- * 函数会释放输入结构体的内存。
  */
 int *poly_arr_create(input *in);
 
