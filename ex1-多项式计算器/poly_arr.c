@@ -7,6 +7,7 @@
 int *poly_arr_create(input *in)
 {
     int size = in->max - in->base + 1;
+    // int size = in->num;
     int base = 2 - in->base;
     int *poly_arr = (int*)malloc(sizeof(int) * (size + 2));
     if (!poly_arr) return NULL;
@@ -16,8 +17,9 @@ int *poly_arr_create(input *in)
     for (int i = 0; i < in->num; i++){
         array_get(in->xi, i, &xi);
         array_get(in->zhi, i, &zhi);
-        poly_arr[zhi + base] = xi;
+        poly_arr[zhi + base] += xi;
     }
+
     poly_arr[0] = size;
     poly_arr[1] = base;
     // array_destroy(in->xi);
