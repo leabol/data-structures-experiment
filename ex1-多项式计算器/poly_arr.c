@@ -7,7 +7,6 @@
 int *poly_arr_create(input *in)
 {
     int size = in->max - in->base + 1;
-    // int size = in->num;
     int base = 2 - in->base;
     int *poly_arr = (int*)malloc(sizeof(int) * (size + 2));
     if (!poly_arr) return NULL;
