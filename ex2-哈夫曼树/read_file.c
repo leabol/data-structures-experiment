@@ -78,12 +78,12 @@ void transfer_to_utf8(int *char_num)
     }
     printf("总结:总共%d个字符，%d个不同字符 \n", num, chars);
 }
-int main()
-{
-int char_num[MAX_UTF8_NUM];
+// int main()
+// {
+// int char_num[MAX_UTF8_NUM];
   
-    read_text("text", char_num);
+//     read_text("text", char_num);
 
-    transfer_to_utf8(char_num);
+//     transfer_to_utf8(char_num);
 
-}
+// }
