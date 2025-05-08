@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -Wall -g
 
 TARGET = main
-SRCS = test.c pri_queue.c read_file.c
+SRCS = main.c pri_queue.c read_file.c huffman.c
 OBJS = $(SRCS:.c=.o)
-HEADERS = 
+HEADERS = pri_queue.h read_file.h sort.h huffman.h
 
 .PHONY: all clean
 
