@@ -4,11 +4,11 @@
  * 
  * 该文件提供了用于读取UTF-8编码文本文件并统计字符出现频率的函数
  */
-
+#include <stdio.h>
 #ifndef READ_FILE_H
 #define READ_FILE_H
 
-#define MAX_UTF8_NUM 70000  // UTF-8编码中可能出现的最大编码值
+#define MAX_UTF8_NUM 500000  // UTF-8编码中可能出现的最大编码值
 
 /**
  * @brief 读取文本文件并统计各字符出现次数
@@ -32,4 +32,7 @@ int read_text(const char *text_path, int *char_num);
  */
 void transfer_to_utf8(int *char_num);
 
+
+int read_char(FILE *fp);
+void to_utf8(int decode, char *utf_8);
 #endif /* READ_FILE_H */
