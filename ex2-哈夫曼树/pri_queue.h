@@ -35,6 +35,7 @@ typedef struct min_heap
  */
 Heap *create_heap(Heap *heap);
 
+void free_heap(Heap *heap);
 /**
  * @brief 向下调整堆
  * @param heap 指向堆结构体的指针

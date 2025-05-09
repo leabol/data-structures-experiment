@@ -6,11 +6,10 @@ Node* buildHuffmanTree(int code[][2], int charCount) {
     Node* root = (Node*)malloc(sizeof(Node));
     root->left = NULL;
     root->right = NULL;
-    root->symbol = -1; // 非叶节点
+    root->symbol = -1; 
 
-    // 为每个字符建立路径
     for (int i = 0; i < MAX_UTF8_NUM; i++) {
-        if (code[i][1] == 0) continue; // 跳过未使用的字符
+        if (code[i][1] == 0) continue; 
         
         int huffCode = code[i][0];
         int codeLen = code[i][1];
@@ -88,7 +87,7 @@ int huffmanEncode(const char* sourcePath, const char* targetPath, int code[][2])
         printf("Failed to open target file: %s\n", targetPath);
         return 1;
     }
-    
+
     FILE *fp;
     if ((fp = fopen(sourcePath, "rb")) == NULL){
         printf("Failed to open source file: %s\n", sourcePath);
@@ -97,7 +96,7 @@ int huffmanEncode(const char* sourcePath, const char* targetPath, int code[][2])
     }
     
     char buff = 0;
-    int buff_size = 8;
+    int buff_size = 8;//buff剩余的位数
     long long byte_size = 0;
     
     // 写入字节大小信息到文件头部
@@ -114,10 +113,8 @@ int huffmanEncode(const char* sourcePath, const char* targetPath, int code[][2])
         
         int mask = (1 << (code_len - 1));
         while (code_len--){
-            if (hafcode & mask) 
+            if (hafcode & mask) //获取hafcode最高位
                 buff |= 1;
-            else 
-                buff |= 0;
             
             mask >>= 1;
             buff_size--;
@@ -130,9 +127,9 @@ int huffmanEncode(const char* sourcePath, const char* targetPath, int code[][2])
         } 
     }
     
-    // 处理最后不足8位的部分
+    // 处理最后不足8位的情况
     if (buff_size != 8){
-        buff <<= (buff_size - 1);
+        buff <<= (buff_size - 1);//将剩余的位以到最高位写入
         fputc(buff, write_fp);
         padding = buff_size;  // 记录填充位数
     }

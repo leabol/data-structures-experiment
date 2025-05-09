@@ -13,6 +13,13 @@ Heap *create_heap(Heap *heap)
     return heap;
 }
 
+void free_heap(Heap *heap)
+{
+    if (!heap) return;
+    free(heap->p);
+    free(heap);
+    return;
+}
 void down_heapify(Heap *heap, int index)
 {
     if (index >= heap->count)

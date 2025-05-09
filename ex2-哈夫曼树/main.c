@@ -15,15 +15,13 @@ int main(int argc, char *argv[]) {
     // 文件路径缓冲区
     char inputFile[MAX_PATH_LENGTH];
     
-    // 编码和解码文件路径直接硬编码
     const char* encodedFile = "Text/encoded_file";
     const char* decodedFile = "Text/decoded_file";
     
     printf("=== 哈夫曼编码解码系统 ===\n");
     
-    // 只获取原始文件路径
-    printf("请输入原始文件路径: ");
-    scanf(" %255s", inputFile);
+    printf("请输入文件路径: ");
+    scanf(" %s", inputFile);
     
     printf("\n将使用以下文件:\n");
     printf("原始文件: %s\n", inputFile);
@@ -38,14 +36,19 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // 2. 构建哈夫曼树的初始节点
+    // 2.构建优先队列 
     Heap *head = create_heap(head);
     
     // 根据字符频率创建初始节点并放入优先队列
     for (int i = 0; i < MAX_UTF8_NUM; i++) {
         if (char_num[i] == 0) continue;
         
-        Node *new_node = (Node*)malloc(sizeof(Node));
+        Node *new_node = (Node*)malloc(sizeof(Node));//哈夫曼节点
+        if (!new_node){
+            free_heap(head);
+            return 1;
+        }
+
         new_node->num = char_num[i];
         new_node->symbol = i;
         new_node->left = NULL;
@@ -94,12 +97,19 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < node_num; i++) {
         order_lens[i] = order_lens[0] + i * 2; // 每行起始地址
     }
+    /*
+    *[0] -> [][][][][][][]....[][][]
+    *[1]--------^   ^
+    *[1]------------|
+    *[2]
+    * 
+    */
 
     int index = 0;
     for (int i = 0; i < MAX_UTF8_NUM; i++) {
         if (lens[i] != 0) {
-            order_lens[index][0] = i;
-            order_lens[index++][1] = lens[i];
+            order_lens[index][0] = i;//符号
+            order_lens[index++][1] = lens[i];//字频
         }
     }
     sort(order_lens, node_num);
@@ -113,17 +123,18 @@ int main(int argc, char *argv[]) {
     code[first_symbol][1] = code_len;
     
     for (int i = 1; i < node_num; i++) {
-        if (code_len != order_lens[i][1]) {
+        if (code_len != order_lens[i][1]){//编码不同的在编码加以后,左移k位
+            int k = order_lens[i][1] - code_len;
             code_len = order_lens[i][1];
-            code_tmp = ((code_tmp + 1) << 1);
+            code_tmp = ((code_tmp + 1) << k);
         } else {
-            code_tmp++;
+            code_tmp++;//编码长度相同的, 编码加一
         }
         code[order_lens[i][0]][0] = code_tmp;
         code[order_lens[i][0]][1] = code_len;
     }
     
-    // 7. 执行编码
+    // 7. 编码
     printf("正在执行编码...\n");
     int encodeResult = huffmanEncode(inputFile, encodedFile, code);
     if (encodeResult == 0) {
@@ -135,7 +146,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // 8. 执行解码
+    // 8. 解码
     printf("正在执行解码...\n");
     int decodeResult = huffmanDecode(encodedFile, decodedFile, code, node_num);
     if (decodeResult == 0) {
