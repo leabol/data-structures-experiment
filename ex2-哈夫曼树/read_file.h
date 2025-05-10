@@ -8,7 +8,7 @@
 #ifndef READ_FILE_H
 #define READ_FILE_H
 
-#define MAX_UTF8_NUM 500000  // UTF-8编码中可能出现的最大编码值
+#define MAX_UTF8_NUM 650000  // UTF-8编码中可能出现的最大编码值
 
 /**
  * @brief 读取文本文件并统计各字符出现次数

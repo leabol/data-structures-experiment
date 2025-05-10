@@ -63,6 +63,7 @@ void printBinary(int num, int bits) {
 void getNodesLens(Node* root, int depth, int *lens)
 {
     if (root->left == NULL && root->right == NULL){
+        if (depth == 0) depth = 1;
         lens[root->symbol] = depth;
         return;
     }

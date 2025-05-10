@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_UTF8_NUM 70000
+#define MAX_UTF8_NUM 650000
 
 
 int read_text(const char *text_path, int *char_num)
@@ -134,7 +134,7 @@ void to_utf8(int decode, char *utf_8)
                 utf8[1] = 0x80 | ((decode >> 12) & 0x3F);
                 utf8[2] = 0x80 | ((decode >> 6) & 0x3F);
                 utf8[3] = 0x80 | (decode & 0x3F);
-                len = 1;
+                len = 4;
             }
             // printf("符号:%s 原始编码: %d\n", utf8, decode);
             memcpy(utf_8, utf8, len);
