@@ -2,15 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include "queue.h"
+#include "pri_queue.h"
 
 #define MAX_VERTEX_NUM   20
-typedef int InfoType;
-typedef int VertexType;
+typedef const char* VertexType;
+
+typedef struct EdgeInfo{
+    double length;
+    double time;
+} InfoType;
 
 typedef struct ArcNode{
     int             adjvex;
     struct ArcNode *nextarc;
-    InfoType       *info;
+    InfoType       info;
 }ArcNode;
 
 typedef struct VNode{
@@ -23,6 +28,11 @@ typedef struct{
     int             vexnum;
     int             arcnum;
 }ALGraph;
+
+typedef struct {
+    int vertex; 
+    double dist; 
+} DijkstraNode;
 
 int init_ALGraph(ALGraph *G)
 {
@@ -44,7 +54,7 @@ static int LocateVex(const ALGraph *G, VertexType u)
 
     int idx = -1;
     for (int i = 0; i < G->vexnum; i++){
-        if (G->vertices[i].data == u) idx = i;
+        if (strcmp(G->vertices[i].data, u) == 0) idx = i;
     }
 
     return idx;
@@ -58,7 +68,7 @@ int AddVertex(ALGraph *G, VertexType data)
     return 1;
 }
 
-int AddEdge(ALGraph *G, VertexType from, VertexType to, InfoType *info)
+int AddEdge(ALGraph *G, VertexType from, VertexType to, double length, double v)
 {
     if (!G) return -1;
 
@@ -71,16 +81,18 @@ int AddEdge(ALGraph *G, VertexType from, VertexType to, InfoType *info)
     new_arcnode->nextarc = G->vertices[from_idx].firstarc;
     G->vertices[from_idx].firstarc = new_arcnode;
     new_arcnode->adjvex = to_idx;
-    new_arcnode->info   = info;
+    new_arcnode->info.length = length;
+    if (v != 0)
+        new_arcnode->info.time = length/v;
 
     G->arcnum++;
     return 1;
 }
 
-int Ud_AddEdge(ALGraph *G, VertexType from, VertexType to, InfoType *info)
+int Ud_AddEdge(ALGraph *G, VertexType from, VertexType to, double length, double v)
 {
-    if (AddEdge(G, from, to, info) == -1) return -1;
-    if (AddEdge(G, to, from, info) == -1) return -1;
+    if (AddEdge(G, from, to, length, v) == -1) return -1;
+    if (AddEdge(G, to, from, length, v) == -1) return -1;
     return 1;
 }
 
@@ -100,7 +112,7 @@ int DestroyALGraph(ALGraph *G)
     return 1;
 }
 
-int FirstAdjVex(const ALGraph *G, valueType v)
+int FirstAdjVex(const ALGraph *G, VertexType v)
 {
     if (!G) return -1;
 
@@ -110,7 +122,7 @@ int FirstAdjVex(const ALGraph *G, valueType v)
     }
     return -1;
 }
-int NextAdjVex(const ALGraph *G, valueType v, valueType w)
+int NextAdjVex(const ALGraph *G, VertexType v, VertexType w)
 {
     if (!G) return -1;
 
@@ -200,38 +212,169 @@ void BFSTraverse(ALGraph *G, void (*visit)(VNode *))
     }//for
     queue_destroy(&Q);
 }
+
+Node* createDijkstraNode(int vertex, double dist)
+{
+    Node* node = (Node*)malloc(sizeof(Node));
+    if (!node) return NULL;
+    
+    node->num = dist;     // 使用num字段存储距离或时间
+    node->left = NULL;    // 这些字段在Dijkstra中没用，但需要初始化
+    node->right = NULL;
+    
+    // 使用一个技巧：将顶点索引存储在指针中，转换为整数
+    node->left = (Node*)(long)vertex;
+    
+    return node;
+}
+
+// 从Node中获取顶点索引
+int getVertexFromNode(Node* node){
+    return (int)(long)(node->left);
+}
+
+void Dijkstra(ALGraph *G, int source, double *dist, int *parent, int type)
+{
+    if (!G || source < 0 || source >= G->vexnum) return;
+    
+    for (int i = 0; i < G->vexnum; i++) {
+        dist[i] = __DBL_MAX__;
+        parent[i] = -1; 
+        visited[i] = 0; 
+    }
+    dist[source] = 0;
+
+    Heap *pq = NULL;
+    pq = create_heap(pq);
+    if (!pq) return;
+    
+    Node* sourceNode = createDijkstraNode(source, 0);
+    push(pq, sourceNode);
+    free(sourceNode); 
+    
+    while (!empty(pq)) {
+        Node min = top(pq);
+        pop(pq);
+        
+        int u = getVertexFromNode(&min);
+        
+        if (visited[u]) continue;
+        visited[u] = 1;
+        
+        ArcNode *tmp = G->vertices[u].firstarc;
+        while (tmp) {
+            double weight = (type == 0) ? tmp->info.length : tmp->info.time;
+            
+            int v = tmp->adjvex;
+            //松弛边
+            if (!visited[v] && dist[v] >  dist[u] + weight) {
+                dist[v] = dist[u] + weight;
+                parent[v] = u;
+                
+                Node* newNode = createDijkstraNode(v, dist[v]);
+                push(pq, newNode);
+                free(newNode);
+            }
+            
+            tmp = tmp->nextarc;
+        }
+    }
+    
+    free_heap(pq);
+}
+
+void printPath(ALGraph *G, int *parent, int target)
+{
+    if (parent[target] == -1) {
+        printf("%s", G->vertices[target].data);
+        return;
+    }
+    
+    printPath(G, parent, parent[target]);
+    printf(" -> %s", G->vertices[target].data);
+}
+
 void print(VNode* node)
 {
-    printf("%d ", node->data);
+    printf("%s ", node->data);
     fflush(stdout);
 }
+
+
 int main()
 {
     ALGraph *G = malloc(sizeof(ALGraph));
     init_ALGraph(G);
 
-    AddVertex(G, 1);
-    AddVertex(G, 2);
-    AddVertex(G, 3);
-    AddVertex(G, 4);
-    AddVertex(G, 5);
-    AddVertex(G, 6);
-    AddVertex(G, 7);
-    AddVertex(G, 8);
+    AddVertex(G, "v1");
+    AddVertex(G, "v2");
+    AddVertex(G, "v3");
+    AddVertex(G, "v4");
+    AddVertex(G, "v5");
+    AddVertex(G, "v6");
+    AddVertex(G, "v7");
+    AddVertex(G, "v8");
+    AddVertex(G, "v9");
+    
+    AddEdge(G, "v1", "v2", 12, 40);
+    AddEdge(G, "v1", "v3", 8, 50);
+    AddEdge(G, "v1", "v4", 6, 60);
+    AddEdge(G, "v2", "v5", 5, 20);
+    AddEdge(G, "v3", "v5", 8, 25);
+    AddEdge(G, "v4", "v6", 7, 55);
+    AddEdge(G, "v5", "v7", 5, 20);
+    AddEdge(G, "v5", "v8", 6, 20);
+    AddEdge(G, "v6", "v8", 10, 40);
+    AddEdge(G, "v7", "v9", 6, 30);
+    AddEdge(G, "v8", "v9", 8, 25);
 
-    AddEdge(G, 1, 2, NULL);
-    AddEdge(G, 1, 3, NULL);
-    AddEdge(G, 2, 4, NULL);
-    AddEdge(G, 2, 5, NULL);
-    AddEdge(G, 4, 8, NULL);
-    AddEdge(G, 5, 8, NULL);
-    AddEdge(G, 3, 6, NULL);
-    AddEdge(G, 3, 7, NULL);
-    AddEdge(G, 6, 7, NULL);
 
-    BFSTraverse(G, print);
-    printf("\n");
-    DFSTraverse(G, print);
+    // printf("图的BFS遍历: ");
+    // BFSTraverse(G, print);
+    // printf("\n");
+    
+    // printf("图的DFS遍历: ");
+    // DFSTraverse(G, print);
+    // printf("\n\n");
 
-    printf("\n");
+    char s[10], t[10];
+    while(1){
+        printf("输入起点终点: ");
+        scanf("%s %s", s, t);
+        int source = LocateVex(G, s);  
+        int target = LocateVex(G, t); 
+        
+        if (source == -1 || target == -1) {
+            printf("节点不存在。\n\n");
+            continue;
+        }
+        
+        double *dist = (double*)malloc(sizeof(double) * G->vexnum);
+        int *parent = (int*)malloc(sizeof(int) * G->vexnum);
+        
+        //距离
+        Dijkstra(G, source, dist, parent, 0);
+            printf("从顶点 %s 到顶点 %s 的最短距离为: %.2f\n", 
+            G->vertices[source].data, G->vertices[target].data, dist[target]);
+        printf("路径为: ");
+        printPath(G, parent, target);
+        printf("\n\n");
+        
+        //时间
+        Dijkstra(G, source, dist, parent, 1);
+        printf("从顶点 %s 到顶点 %s 的最短时间为: %.2f\n", 
+            G->vertices[source].data, G->vertices[target].data, dist[target]);
+        printf("路径为: ");
+        printPath(G, parent, target);
+        printf("\n");
+        
+        free(dist);
+        free(parent);
+
+        printf("/**********/\n");
+    }
+    
+    DestroyALGraph(G);
+
+    return 0;
 }
