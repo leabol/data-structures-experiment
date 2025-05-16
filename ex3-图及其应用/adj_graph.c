@@ -218,19 +218,20 @@ Node* createDijkstraNode(int vertex, double dist)
     Node* node = (Node*)malloc(sizeof(Node));
     if (!node) return NULL;
     
+    node->indx = vertex;
     node->num = dist;     // 使用num字段存储距离或时间
     node->left = NULL;    // 这些字段在Dijkstra中没用，但需要初始化
     node->right = NULL;
     
     // 使用一个技巧：将顶点索引存储在指针中，转换为整数
-    node->left = (Node*)(long)vertex;
+    // node->left = (Node*)(long)vertex;
     
     return node;
 }
 
 // 从Node中获取顶点索引
 int getVertexFromNode(Node* node){
-    return (int)(long)(node->left);
+    return node->indx;
 }
 
 void Dijkstra(ALGraph *G, int source, double *dist, int *parent, int type)
@@ -253,10 +254,10 @@ void Dijkstra(ALGraph *G, int source, double *dist, int *parent, int type)
     free(sourceNode); 
     
     while (!empty(pq)) {
-        Node min = top(pq);
+        Node* min = top(pq);
+        if(!min) break;
+        int u = min->indx;
         pop(pq);
-        
-        int u = getVertexFromNode(&min);
         
         if (visited[u]) continue;
         visited[u] = 1;
@@ -338,6 +339,9 @@ int main()
     // printf("\n\n");
 
     char s[10], t[10];
+    double *dist = (double*)malloc(sizeof(double) * G->vexnum);
+    int *parent = (int*)malloc(sizeof(int) * G->vexnum);
+
     while(1){
         printf("输入起点终点: ");
         scanf("%s %s", s, t);
@@ -349,31 +353,25 @@ int main()
             continue;
         }
         
-        double *dist = (double*)malloc(sizeof(double) * G->vexnum);
-        int *parent = (int*)malloc(sizeof(int) * G->vexnum);
-        
         //距离
         Dijkstra(G, source, dist, parent, 0);
-            printf("从顶点 %s 到顶点 %s 的最短距离为: %.2f\n", 
-            G->vertices[source].data, G->vertices[target].data, dist[target]);
+        printf("从顶点 %s 到顶点 %s 的最短距离为: %.2f\n", G->vertices[source].data, G->vertices[target].data, dist[target]);
         printf("路径为: ");
         printPath(G, parent, target);
         printf("\n\n");
         
         //时间
         Dijkstra(G, source, dist, parent, 1);
-        printf("从顶点 %s 到顶点 %s 的最短时间为: %.2f\n", 
-            G->vertices[source].data, G->vertices[target].data, dist[target]);
+        printf("从顶点 %s 到顶点 %s 的最短时间为: %.2f\n", G->vertices[source].data, G->vertices[target].data, dist[target]);
         printf("路径为: ");
         printPath(G, parent, target);
         printf("\n");
         
-        free(dist);
-        free(parent);
-
         printf("/**********/\n");
     }
     
+    free(dist);
+    free(parent);
     DestroyALGraph(G);
 
     return 0;

@@ -14,6 +14,7 @@ typedef struct char_node
 {
     // 使用double来存储距离/时间
     double num;
+    int indx;
     struct char_node *left;
     struct char_node *right;
 }Node;
@@ -68,7 +69,7 @@ void pop(Heap *heap);
  * @param heap 指向堆结构体的指针
  * @return 堆顶元素的值，如果堆为空则返回 INT_MIN
  */
-Node top(Heap *heap);
+Node* top(Heap *heap);
 
 /**
  * @brief 检查堆是否为空

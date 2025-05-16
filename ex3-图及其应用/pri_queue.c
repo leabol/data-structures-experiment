@@ -72,13 +72,12 @@ void up_heapify(Heap *heap, int index)
 
 void push(Heap *heap, Node* x)
 {
-    if (heap->count >= heap->size)
-    {
+    if (heap->count >= heap->size){
         heap->size *= 2;
         heap->p = (Node *)realloc(heap->p, (heap->size) * sizeof(Node));
     }
     (heap->p + heap->count)->num = x->num;
-    // (heap->p + heap->count)->symbol = x->symbol;
+    (heap->p + heap->count)->indx = x->indx;  
     (heap->p + heap->count)->left = x->left;
     (heap->p + heap->count)->right = x->right;
     heap->count++;
@@ -94,23 +93,22 @@ void pop(Heap *heap)
     *(heap->p + heap->count) = *(heap->p);
     *(heap->p) = temp;
     down_heapify(heap, 0);
-    if (4 * heap->count <= heap->size && heap->size > 1)
-    {
+    if (4 * heap->count <= heap->size && heap->size > 1) {
         heap->size /= 2;
         heap->p = (Node *)realloc(heap->p, (heap->size) * sizeof(Node));
     }
 }
 
-Node top(Heap *heap)
+Node* top(Heap *heap)
 {
     if (heap->count != 0)
-        return *(heap->p);
-    else
-    {
-        Node empty_node = {__DBL_MAX__};
-        empty_node.left = NULL;
-        empty_node.right = NULL;
-        return empty_node;
+        return &(heap->p[0]);
+    else{
+        return NULL;
+        // Node empty_node = {__DBL_MAX__};
+        // empty_node.left = NULL;
+        // empty_node.right = NULL;
+        // return empty_node;
     }
 }
 
